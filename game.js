@@ -364,6 +364,18 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// Touch event listeners for mobile devices
+canvas.addEventListener('touchstart', (event) => {
+    event.preventDefault();
+    jump();
+});
+
+// Also add click event as fallback for non-touch devices that use mouse
+canvas.addEventListener('click', (event) => {
+    event.preventDefault();
+    jump();
+});
+
 // Start the game
 connectToServer();
 init();

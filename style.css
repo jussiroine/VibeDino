@@ -30,6 +30,11 @@ h1 {
     background: #f0f8ff;
     display: block;
     margin: 0 auto 20px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    touch-action: manipulation;
 }
 
 .instructions {
