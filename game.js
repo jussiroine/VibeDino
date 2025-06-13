@@ -29,7 +29,13 @@ const dino = {
     jumpForward: 1.8,
     gravity: 0.5,
     grounded: true,
-    color: '#2E7D32'
+    color: '#2E7D32',
+    speechBubble: {
+        message: '',
+        visible: false,
+        timer: 0,
+        duration: 2000 // 2 seconds
+    }
 };
 
 // Obstacles array
@@ -37,6 +43,10 @@ let obstacles = [];
 const obstacleWidth = 15;
 const obstacleHeight = 15;
 let nextObstacleDistance = 0;
+
+// Speech bubble messages
+const encouragingMessages = ['yay!', 'jumpy!', 'so fast!', 'gr8!', 'awesome!', 'nice!', 'woohoo!', 'keep going!'];
+let lastSpeechBubbleTime = 0;
 
 // Ground level
 const groundY = 190;
@@ -131,6 +141,10 @@ function init() {
     dino.dy = 0;
     dino.dx = 0;
     dino.grounded = true;
+    dino.speechBubble.visible = false;
+    dino.speechBubble.message = '';
+    dino.speechBubble.timer = 0;
+    lastSpeechBubbleTime = 0;
     gameOverElement.classList.add('hidden');
     updateScore();
     gameLoop();
@@ -153,6 +167,28 @@ function gameLoop() {
 function update() {
     // Only update if local game is running
     if (!gameRunning) return;
+    
+    // Update speech bubble timer
+    if (dino.speechBubble.visible) {
+        dino.speechBubble.timer -= 16; // Approximate frame time
+        if (dino.speechBubble.timer <= 0) {
+            dino.speechBubble.visible = false;
+            dino.speechBubble.message = '';
+        }
+    }
+    
+    // Generate random speech bubbles
+    const currentTime = Date.now();
+    if (!dino.speechBubble.visible && currentTime - lastSpeechBubbleTime > 3000) { // At least 3 seconds between bubbles
+        // Random chance for speech bubble (about 2% chance per frame at 60fps for better visibility)
+        if (Math.random() < 0.02) {
+            const randomMessage = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
+            dino.speechBubble.message = randomMessage;
+            dino.speechBubble.visible = true;
+            dino.speechBubble.timer = dino.speechBubble.duration;
+            lastSpeechBubbleTime = currentTime;
+        }
+    }
     
     // Update dino physics
     if (!dino.grounded) {
@@ -278,6 +314,11 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
     ctx.fillRect(gameState.dino.x + 5 * gameScale, dinoY + dino.height * gameScale, 6 * gameScale, 8 * gameScale);
     ctx.fillRect(gameState.dino.x + 25 * gameScale, dinoY + dino.height * gameScale, 6 * gameScale, 8 * gameScale);
     
+    // Draw speech bubble if visible
+    if (gameState.dino.speechBubble && gameState.dino.speechBubble.visible && gameState.dino.speechBubble.message) {
+        drawSpeechBubble(gameState.dino.x, dinoY, gameState.dino.speechBubble.message, gameScale);
+    }
+    
     // Draw obstacles
     ctx.fillStyle = '#795548';
     gameState.obstacles.forEach(obstacle => {
@@ -309,6 +350,53 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
         ctx.font = '16px Arial';
         ctx.fillText('GAME OVER', canvas.width / 2 - 40, offsetY + gameHeight / 2);
     }
+}
+
+function drawSpeechBubble(dinoX, dinoY, message, gameScale) {
+    const bubbleWidth = Math.max(60, message.length * 8) * gameScale;
+    const bubbleHeight = 20 * gameScale;
+    const bubbleX = dinoX + (dino.width * gameScale / 2) - (bubbleWidth / 2);
+    const bubbleY = dinoY - bubbleHeight - 10 * gameScale;
+    
+    // Draw speech bubble background
+    ctx.fillStyle = 'white';
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    
+    // Draw rounded rectangle for bubble (with fallback for older browsers)
+    ctx.beginPath();
+    if (ctx.roundRect) {
+        ctx.roundRect(bubbleX, bubbleY, bubbleWidth, bubbleHeight, 5 * gameScale);
+    } else {
+        // Fallback to regular rectangle
+        ctx.rect(bubbleX, bubbleY, bubbleWidth, bubbleHeight);
+    }
+    ctx.fill();
+    ctx.stroke();
+    
+    // Draw speech bubble tail
+    ctx.fillStyle = 'white';
+    ctx.strokeStyle = '#333';
+    ctx.beginPath();
+    const tailX = dinoX + (dino.width * gameScale / 2);
+    const tailY = bubbleY + bubbleHeight;
+    ctx.moveTo(tailX - 5 * gameScale, tailY);
+    ctx.lineTo(tailX + 5 * gameScale, tailY);
+    ctx.lineTo(tailX, tailY + 8 * gameScale);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    
+    // Draw text
+    ctx.fillStyle = '#333';
+    ctx.font = `${Math.max(10, 12 * gameScale)}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(message, bubbleX + bubbleWidth / 2, bubbleY + bubbleHeight / 2);
+    
+    // Reset text alignment
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
 }
 
 function getPlayerColor(playerId) {
