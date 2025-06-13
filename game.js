@@ -17,7 +17,9 @@ const dino = {
     width: 40,
     height: 40,
     dy: 0,
-    jumpPower: -15,
+    dx: 0,
+    jumpPower: -10,
+    jumpForward: 1.5,
     gravity: 0.5,
     grounded: true,
     color: '#2E7D32'
@@ -27,9 +29,16 @@ const dino = {
 let obstacles = [];
 const obstacleWidth = 20;
 const obstacleHeight = 40;
+let nextObstacleDistance = 0;
 
 // Ground level
 const groundY = 190;
+
+// Generate random obstacle distance
+function getRandomObstacleDistance() {
+    // Return random distance between 150 and 350 pixels
+    return Math.random() * 200 + 150;
+}
 
 // Initialize game
 function init() {
@@ -37,8 +46,11 @@ function init() {
     score = 0;
     gameSpeed = 2;
     obstacles = [];
+    nextObstacleDistance = getRandomObstacleDistance();
+    dino.x = 50;
     dino.y = 150;
     dino.dy = 0;
+    dino.dx = 0;
     dino.grounded = true;
     gameOverElement.classList.add('hidden');
     updateScore();
@@ -60,23 +72,27 @@ function update() {
     if (!dino.grounded) {
         dino.dy += dino.gravity;
         dino.y += dino.dy;
+        dino.x += dino.dx;
         
         // Check if dino landed
         if (dino.y >= 150) {
             dino.y = 150;
             dino.dy = 0;
+            dino.dx = 0;
             dino.grounded = true;
         }
     }
     
     // Generate obstacles
-    if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width - 200) {
+    if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width - nextObstacleDistance) {
         obstacles.push({
             x: canvas.width,
             y: groundY - obstacleHeight,
             width: obstacleWidth,
             height: obstacleHeight
         });
+        // Set next random distance
+        nextObstacleDistance = getRandomObstacleDistance();
     }
     
     // Update obstacles
@@ -178,6 +194,7 @@ function updateScore() {
 function jump() {
     if (dino.grounded && gameRunning) {
         dino.dy = dino.jumpPower;
+        dino.dx = dino.jumpForward;
         dino.grounded = false;
     }
 }
