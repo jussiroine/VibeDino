@@ -33,8 +33,8 @@ const dino = {
 
 // Obstacles array
 let obstacles = [];
-const obstacleWidth = 20;
-const obstacleHeight = 40;
+const obstacleWidth = 15;
+const obstacleHeight = 25;
 let nextObstacleDistance = 0;
 
 // Ground level
