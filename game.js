@@ -131,8 +131,6 @@ function init() {
 
 // Game loop
 function gameLoop() {
-    if (!gameRunning) return;
-    
     update();
     draw();
     
@@ -146,6 +144,9 @@ function gameLoop() {
 
 // Update game state
 function update() {
+    // Only update if local game is running
+    if (!gameRunning) return;
+    
     // Update dino physics
     if (!dino.grounded) {
         dino.dy += dino.gravity;
@@ -250,29 +251,30 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
     ctx.lineTo(canvas.width, scaledGroundY);
     ctx.stroke();
     
-    // Scale dino position to fit in the allocated space
-    const dinoY = offsetY + (gameState.dino.y / 200) * (gameHeight - 20);
+    // Scale positions to fit in the allocated space
+    const gameScale = gameHeight / 200; // Original canvas height was 200
+    const dinoY = offsetY + gameHeight - ((200 - gameState.dino.y) * gameScale) - 10;
     
     // Draw dino with different colors for different players
     const dinoColor = isOwnGame ? '#2E7D32' : getPlayerColor(gameState.playerId);
     ctx.fillStyle = dinoColor;
-    ctx.fillRect(gameState.dino.x, dinoY, dino.width, dino.height);
+    ctx.fillRect(gameState.dino.x, dinoY, dino.width * gameScale, dino.height * gameScale);
     
     // Draw dino eye
     ctx.fillStyle = 'white';
-    ctx.fillRect(gameState.dino.x + 25, dinoY + 8, 6, 6);
+    ctx.fillRect(gameState.dino.x + 25 * gameScale, dinoY + 8 * gameScale, 6 * gameScale, 6 * gameScale);
     ctx.fillStyle = 'black';
-    ctx.fillRect(gameState.dino.x + 26, dinoY + 9, 4, 4);
+    ctx.fillRect(gameState.dino.x + 26 * gameScale, dinoY + 9 * gameScale, 4 * gameScale, 4 * gameScale);
     
     // Draw dino legs
     ctx.fillStyle = dinoColor;
-    ctx.fillRect(gameState.dino.x + 5, dinoY + dino.height, 6, 8);
-    ctx.fillRect(gameState.dino.x + 25, dinoY + dino.height, 6, 8);
+    ctx.fillRect(gameState.dino.x + 5 * gameScale, dinoY + dino.height * gameScale, 6 * gameScale, 8 * gameScale);
+    ctx.fillRect(gameState.dino.x + 25 * gameScale, dinoY + dino.height * gameScale, 6 * gameScale, 8 * gameScale);
     
     // Draw obstacles
     ctx.fillStyle = '#795548';
     gameState.obstacles.forEach(obstacle => {
-        const scaledHeight = Math.max(10, obstacleHeight * (gameHeight / 200));
+        const scaledHeight = obstacleHeight * gameScale;
         const obstacleY = scaledGroundY - scaledHeight;
         ctx.fillRect(obstacle.x, obstacleY, obstacle.width, scaledHeight);
         
@@ -288,7 +290,7 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
     ctx.fillStyle = isOwnGame ? '#2E7D32' : '#666';
     ctx.font = '12px Arial';
     ctx.fillText(`Score: ${gameState.score}`, 10, offsetY + 15);
-    if (!isOwnGame) {
+    if (!isOwnGame && gameState.playerId) {
         ctx.fillText(`Player: ${gameState.playerId.substr(0, 6)}`, 10, offsetY + 30);
     }
     
