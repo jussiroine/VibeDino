@@ -25,9 +25,9 @@ const dino = {
     height: 40,
     dy: 0,
     dx: 0,
-    jumpPower: -12,
+    jumpPower: -8,
     jumpForward: 1.8,
-    gravity: 0.4,
+    gravity: 0.5,
     grounded: true,
     color: '#2E7D32'
 };
