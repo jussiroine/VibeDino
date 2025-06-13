@@ -26,8 +26,8 @@ const dino = {
     dy: 0,
     dx: 0,
     jumpPower: -12,
-    jumpForward: 1.5,
-    gravity: 0.5,
+    jumpForward: 1.8,
+    gravity: 0.4,
     grounded: true,
     color: '#2E7D32'
 };
@@ -35,7 +35,7 @@ const dino = {
 // Obstacles array
 let obstacles = [];
 const obstacleWidth = 15;
-const obstacleHeight = 20;
+const obstacleHeight = 15;
 let nextObstacleDistance = 0;
 
 // Ground level
