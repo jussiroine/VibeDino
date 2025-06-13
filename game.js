@@ -15,6 +15,7 @@ let connectionStatus = 'connecting';
 let gameRunning = true;
 let score = 0;
 let gameSpeed = 2;
+let animationFrameId = null;
 
 // T-Rex character
 const dino = {
@@ -114,6 +115,12 @@ function getRandomObstacleDistance() {
 
 // Initialize game
 function init() {
+    // Cancel any existing game loop
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
+    
     gameRunning = true;
     score = 0;
     gameSpeed = 2;
@@ -139,7 +146,7 @@ function gameLoop() {
         sendGameState();
     }
     
-    requestAnimationFrame(gameLoop);
+    animationFrameId = requestAnimationFrame(gameLoop);
 }
 
 // Update game state
