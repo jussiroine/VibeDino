@@ -198,7 +198,6 @@ function updateScore() {
 function jump() {
     if (dino.grounded && gameRunning) {
         dino.dy = dino.jumpPower;
-        dino.dx = dino.jumpForward;
         dino.grounded = false;
     }
 }
