@@ -74,6 +74,10 @@ function update() {
         dino.y += dino.dy;
         dino.x += dino.dx;
         
+        // Keep dino within canvas bounds
+        if (dino.x < 0) dino.x = 0;
+        if (dino.x > canvas.width - dino.width) dino.x = canvas.width - dino.width;
+        
         // Check if dino landed
         if (dino.y >= 150) {
             dino.y = 150;
