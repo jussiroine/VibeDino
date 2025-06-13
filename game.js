@@ -25,7 +25,7 @@ const dino = {
     height: 40,
     dy: 0,
     dx: 0,
-    jumpPower: -8,
+    jumpPower: -9,
     jumpForward: 1.8,
     gravity: 0.5,
     grounded: true,
