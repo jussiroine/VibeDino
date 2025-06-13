@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VibeDino Multiplayer Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-container { margin: 20px 0; }
+        button { padding: 10px 20px; margin: 5px; }
+        #status { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>VibeDino Multiplayer Test</h1>
+    <div class="test-container">
+        <p>Server Status: <span id="status">Not connected</span></p>
+        <button onclick="testConnection()">Test Connection</button>
+        <button onclick="openGameWindow()">Open Game Window</button>
+    </div>
+    <div id="log"></div>
+    
+    <script>
+        let ws = null;
+        
+        function testConnection() {
+            const status = document.getElementById('status');
+            const log = document.getElementById('log');
+            
+            ws = new WebSocket('ws://localhost:3000');
+            
+            ws.onopen = () => {
+                status.textContent = 'Connected';
+                status.style.color = 'green';
+                log.innerHTML += '<p>✓ Connected to server</p>';
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                log.innerHTML += `<p>Received: ${JSON.stringify(data, null, 2)}</p>`;
+            };
+            
+            ws.onclose = () => {
+                status.textContent = 'Disconnected';
+                status.style.color = 'red';
+                log.innerHTML += '<p>✗ Disconnected from server</p>';
+            };
+            
+            ws.onerror = (error) => {
+                status.textContent = 'Error';
+                status.style.color = 'red';
+                log.innerHTML += `<p>✗ Error: ${error}</p>`;
+            };
+        }
+        
+        function openGameWindow() {
+            window.open('http://localhost:3000', '_blank');
+        }
+    </script>
+</body>
+</html>
