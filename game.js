@@ -17,8 +17,8 @@ const dino = {
     width: 40,
     height: 40,
     dy: 0,
-    jumpPower: -12,
-    gravity: 0.6,
+    jumpPower: -15,
+    gravity: 0.5,
     grounded: true,
     color: '#2E7D32'
 };
@@ -89,9 +89,9 @@ function update() {
             score += 10;
             updateScore();
             
-            // Increase game speed slightly as score increases
-            if (score % 100 === 0) {
-                gameSpeed += 0.2;
+            // Increase game speed gradually as score increases
+            if (score % 50 === 0) {
+                gameSpeed += 0.1;
             }
         }
     }
