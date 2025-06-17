@@ -25,9 +25,9 @@ const dino = {
     height: 40,
     dy: 0,
     dx: 0,
-    jumpPower: -11,
+    jumpPower: -13,
     jumpForward: 3.0,
-    gravity: 0.4,
+    gravity: 0.35,
     grounded: true,
     color: '#2E7D32',
     speechBubble: {
@@ -41,7 +41,7 @@ const dino = {
 // Obstacles array
 let obstacles = [];
 const obstacleWidth = 15;
-const obstacleHeight = 15;
+const obstacleHeight = 12;
 let nextObstacleDistance = 0;
 
 // Speech bubble messages
@@ -119,8 +119,8 @@ function sendGameState() {
 
 // Generate random obstacle distance
 function getRandomObstacleDistance() {
-    // Return random distance between 150 and 350 pixels
-    return Math.random() * 200 + 150;
+    // Return random distance between 200 and 400 pixels
+    return Math.random() * 200 + 200;
 }
 
 // Initialize game
@@ -232,7 +232,7 @@ function update() {
             updateScore();
             
             // Increase game speed gradually as score increases
-            if (score % 50 === 0) {
+            if (score % 100 === 0) {
                 gameSpeed += 0.1;
             }
         }
@@ -416,11 +416,12 @@ function drawConnectionStatus() {
 
 // Check collisions between dino and obstacles
 function checkCollisions() {
+    const collisionBuffer = 2; // Make collision slightly more forgiving
     obstacles.forEach(obstacle => {
-        if (dino.x < obstacle.x + obstacle.width &&
-            dino.x + dino.width > obstacle.x &&
-            dino.y < obstacle.y + obstacle.height &&
-            dino.y + dino.height > obstacle.y) {
+        if (dino.x + collisionBuffer < obstacle.x + obstacle.width &&
+            dino.x + dino.width - collisionBuffer > obstacle.x &&
+            dino.y + collisionBuffer < obstacle.y + obstacle.height &&
+            dino.y + dino.height - collisionBuffer > obstacle.y) {
             gameOver();
         }
     });
