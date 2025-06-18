@@ -452,11 +452,22 @@ function jump() {
     }
 }
 
+// Donald's secret bonus function
+function addBonusPoints() {
+    if (gameRunning) {
+        score += 100;
+        updateScore();
+    }
+}
+
 // Keyboard event listeners
 document.addEventListener('keydown', (event) => {
     if (event.code === 'Space') {
         event.preventDefault();
         jump();
+    } else if (event.code === 'KeyD') {
+        event.preventDefault();
+        addBonusPoints();
     }
 });
 
