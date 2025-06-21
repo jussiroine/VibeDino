@@ -25,9 +25,9 @@ const dino = {
     height: 40,
     dy: 0,
     dx: 0,
-    jumpPower: -13,
-    jumpForward: 3.0,
-    gravity: 0.35,
+    jumpPower: -11,
+    jumpForward: 4.0,
+    gravity: 0.38,
     grounded: true,
     color: '#2E7D32',
     speechBubble: {
