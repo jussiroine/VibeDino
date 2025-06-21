@@ -26,6 +26,10 @@ A feature-rich multiplayer version of the classic T-Rex dino game with **dynamic
 - **💾 Persistent Scores**: High scores are saved and tracked across sessions
 - **📱 Admin Dashboard**: Dedicated stats page at `/stats.html`
 
+
+### ▶️ Live demo
+- `https://vibedino.jussiroine.com`
+
 ## 🚀 Quick Start
 
 1. **Install dependencies:**
