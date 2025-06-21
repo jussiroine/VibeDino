@@ -48,6 +48,21 @@ let nextObstacleDistance = 0;
 const encouragingMessages = ['yay!', 'jumpy!', 'so fast!', 'gr8!', 'awesome!', 'nice!', 'woohoo!', 'keep going!'];
 let lastSpeechBubbleTime = 0;
 
+// Environmental effects
+let environmentState = {
+    mode: 'normal', // 'normal', 'night', 'rain', 'sandstorm'
+    timer: 0,
+    nightModeTimer: 0,
+    weatherTimer: 0,
+    particles: []
+};
+
+// Environmental timing constants
+const NIGHT_MODE_INTERVAL = 30000; // 30 seconds
+const NIGHT_MODE_DURATION = 10000; // 10 seconds
+const WEATHER_EFFECT_DURATION = 10000; // 10 seconds
+const WEATHER_EFFECT_CHANCE = 0.001; // 0.1% chance per frame check for occasional effects
+
 // Ground level
 const groundY = 190;
 
@@ -145,6 +160,16 @@ function init() {
     dino.speechBubble.message = '';
     dino.speechBubble.timer = 0;
     lastSpeechBubbleTime = 0;
+    
+    // Reset environmental state
+    environmentState = {
+        mode: 'normal',
+        timer: 0,
+        nightModeTimer: 0,
+        weatherTimer: 0,
+        particles: []
+    };
+    
     gameOverElement.classList.add('hidden');
     updateScore();
     gameLoop();
@@ -240,6 +265,125 @@ function update() {
     
     // Check collisions
     checkCollisions();
+    
+    // Update environmental effects
+    updateEnvironmentalEffects();
+}
+
+// Update environmental effects (night mode, weather)
+function updateEnvironmentalEffects() {
+    const currentTime = Date.now();
+    
+    // Update night mode timer (independent of weather)
+    environmentState.nightModeTimer += 16; // Approximate frame time
+    
+    // Check if we should start night mode (every 30 seconds)
+    if (environmentState.nightModeTimer >= NIGHT_MODE_INTERVAL) {
+        // Toggle night mode
+        if (environmentState.mode === 'normal') {
+            environmentState.mode = 'night';
+            environmentState.timer = NIGHT_MODE_DURATION;
+        } else if (environmentState.mode === 'night') {
+            environmentState.mode = 'normal';
+        } else if (environmentState.mode === 'rain') {
+            environmentState.mode = 'night-rain';
+            environmentState.timer = Math.max(environmentState.timer, NIGHT_MODE_DURATION);
+        } else if (environmentState.mode === 'sandstorm') {
+            environmentState.mode = 'night-sandstorm';
+            environmentState.timer = Math.max(environmentState.timer, NIGHT_MODE_DURATION);
+        }
+        environmentState.nightModeTimer = 0;
+    }
+    
+    // Handle night mode timer
+    if (environmentState.mode === 'night' || environmentState.mode === 'night-rain' || environmentState.mode === 'night-sandstorm') {
+        environmentState.timer -= 16;
+        if (environmentState.timer <= 0) {
+            if (environmentState.mode === 'night') {
+                environmentState.mode = 'normal';
+            } else if (environmentState.mode === 'night-rain') {
+                environmentState.mode = 'rain';
+                environmentState.timer = WEATHER_EFFECT_DURATION / 2; // Continue rain for a bit
+            } else if (environmentState.mode === 'night-sandstorm') {
+                environmentState.mode = 'sandstorm';
+                environmentState.timer = WEATHER_EFFECT_DURATION / 2; // Continue sandstorm for a bit
+            }
+        }
+    }
+    
+    // Update weather effects
+    if (environmentState.mode === 'normal' || environmentState.mode === 'night') {
+        // Random chance to start weather effect
+        if (Math.random() < WEATHER_EFFECT_CHANCE) {
+            const weatherTypes = ['rain', 'sandstorm'];
+            const weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+            environmentState.mode = environmentState.mode === 'night' ? `night-${weather}` : weather;
+            environmentState.timer = Math.max(environmentState.timer, WEATHER_EFFECT_DURATION);
+            environmentState.particles = [];
+            initializeWeatherParticles();
+        }
+    } else if (environmentState.mode === 'rain' || environmentState.mode === 'sandstorm' || 
+               environmentState.mode === 'night-rain' || environmentState.mode === 'night-sandstorm') {
+        // Update weather timer
+        environmentState.timer -= 16;
+        if (environmentState.timer <= 0) {
+            if (environmentState.mode === 'rain' || environmentState.mode === 'sandstorm') {
+                environmentState.mode = 'normal';
+            } else {
+                environmentState.mode = 'night';
+                environmentState.timer = NIGHT_MODE_DURATION / 2; // Continue night mode for a bit
+            }
+            environmentState.particles = [];
+        } else {
+            updateWeatherParticles();
+        }
+    }
+}
+
+// Initialize weather particles
+function initializeWeatherParticles() {
+    environmentState.particles = [];
+    const hasRain = environmentState.mode.includes('rain');
+    const hasSandstorm = environmentState.mode.includes('sandstorm');
+    const particleCount = hasRain ? 100 : hasSandstorm ? 50 : 0;
+    
+    for (let i = 0; i < particleCount; i++) {
+        environmentState.particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            speed: hasRain ? 3 + Math.random() * 2 : 1 + Math.random(),
+            opacity: Math.random() * 0.7 + 0.3,
+            size: hasRain ? 1 : 2 + Math.random() * 2
+        });
+    }
+}
+
+// Update weather particles
+function updateWeatherParticles() {
+    const hasRain = environmentState.mode.includes('rain');
+    const hasSandstorm = environmentState.mode.includes('sandstorm');
+    
+    environmentState.particles.forEach(particle => {
+        if (hasRain) {
+            particle.y += particle.speed;
+            particle.x += particle.speed * 0.1; // Slight diagonal movement
+            
+            // Reset particle when it goes off screen
+            if (particle.y > canvas.height) {
+                particle.y = -10;
+                particle.x = Math.random() * canvas.width;
+            }
+        } else if (hasSandstorm) {
+            particle.x += particle.speed;
+            particle.y += Math.sin(Date.now() * 0.01 + particle.x * 0.01) * 0.5; // Wavy movement
+            
+            // Reset particle when it goes off screen
+            if (particle.x > canvas.width) {
+                particle.x = -10;
+                particle.y = Math.random() * canvas.height;
+            }
+        }
+    });
 }
 
 // Draw game elements
@@ -278,8 +422,18 @@ function draw() {
 function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
     const scaledGroundY = offsetY + gameHeight - 10;
     
-    // Draw background for this game
-    ctx.fillStyle = isOwnGame ? '#f0f8ff' : '#f5f5f5';
+    // Draw background for this game (with environmental effects)
+    let backgroundColor = isOwnGame ? '#f0f8ff' : '#f5f5f5';
+    const isNightMode = environmentState.mode.includes('night');
+    const isSandstorm = environmentState.mode.includes('sandstorm');
+    
+    if (isNightMode) {
+        backgroundColor = isOwnGame ? '#1a1a2e' : '#16213e';
+    } else if (isSandstorm) {
+        backgroundColor = isOwnGame ? '#d4a574' : '#c49660';
+    }
+    
+    ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, offsetY, canvas.width, gameHeight);
     
     // Draw ground
@@ -300,6 +454,13 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
     
     // Draw dino with different colors for different players
     const dinoColor = isOwnGame ? '#2E7D32' : getPlayerColor(gameState.playerId);
+    
+    // Add glow effect during night mode to make dino more visible
+    if (isNightMode) {
+        ctx.shadowColor = dinoColor;
+        ctx.shadowBlur = 8;
+    }
+    
     ctx.fillStyle = dinoColor;
     ctx.fillRect(gameState.dino.x, dinoY, dino.width * gameScale, dino.height * gameScale);
     
@@ -313,6 +474,11 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
     ctx.fillStyle = dinoColor;
     ctx.fillRect(gameState.dino.x + 5 * gameScale, dinoY + dino.height * gameScale, 6 * gameScale, 8 * gameScale);
     ctx.fillRect(gameState.dino.x + 25 * gameScale, dinoY + dino.height * gameScale, 6 * gameScale, 8 * gameScale);
+    
+    // Reset shadow
+    if (isNightMode) {
+        ctx.shadowBlur = 0;
+    }
     
     // Draw speech bubble if visible
     if (gameState.dino.speechBubble && gameState.dino.speechBubble.visible && gameState.dino.speechBubble.message) {
@@ -342,6 +508,9 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
         ctx.fillText(`Player: ${gameState.playerId.substr(0, 6)}`, 10, offsetY + 30);
     }
     
+    // Draw weather effects
+    drawWeatherEffects(offsetY, gameHeight);
+    
     // Draw game over indicator
     if (!gameState.gameRunning) {
         ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
@@ -349,6 +518,36 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
         ctx.fillStyle = '#ff4444';
         ctx.font = '16px Arial';
         ctx.fillText('GAME OVER', canvas.width / 2 - 40, offsetY + gameHeight / 2);
+    }
+}
+
+// Draw weather effects
+function drawWeatherEffects(offsetY, gameHeight) {
+    const hasRain = environmentState.mode.includes('rain');
+    const hasSandstorm = environmentState.mode.includes('sandstorm');
+    
+    if (hasRain) {
+        ctx.strokeStyle = 'rgba(135, 206, 235, 0.8)';
+        ctx.lineWidth = 2;
+        environmentState.particles.forEach(particle => {
+            if (particle.y >= offsetY && particle.y <= offsetY + gameHeight) {
+                ctx.globalAlpha = particle.opacity;
+                ctx.beginPath();
+                ctx.moveTo(particle.x, particle.y);
+                ctx.lineTo(particle.x + 3, particle.y + 10);
+                ctx.stroke();
+            }
+        });
+        ctx.globalAlpha = 1;
+    } else if (hasSandstorm) {
+        ctx.fillStyle = 'rgba(212, 165, 116, 0.6)';
+        environmentState.particles.forEach(particle => {
+            if (particle.y >= offsetY && particle.y <= offsetY + gameHeight) {
+                ctx.globalAlpha = particle.opacity;
+                ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+            }
+        });
+        ctx.globalAlpha = 1;
     }
 }
 
@@ -412,6 +611,11 @@ function drawConnectionStatus() {
     ctx.fillStyle = connectionStatus === 'connected' ? '#4CAF50' : '#ff4444';
     ctx.font = '10px Arial';
     ctx.fillText(connectionStatus === 'connected' ? '● Online' : '● Offline', canvas.width - 60, 15);
+    
+    // Show current environmental mode for testing
+    ctx.fillStyle = '#333';
+    ctx.font = '10px Arial';
+    ctx.fillText(`Mode: ${environmentState.mode}`, 10, canvas.height - 10);
 }
 
 // Check collisions between dino and obstacles
