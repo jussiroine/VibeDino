@@ -58,10 +58,10 @@ let environmentState = {
 };
 
 // Environmental timing constants
-const NIGHT_MODE_INTERVAL = 30000; // 30 seconds
-const NIGHT_MODE_DURATION = 10000; // 10 seconds
-const WEATHER_EFFECT_DURATION = 10000; // 10 seconds
-const WEATHER_EFFECT_CHANCE = 0.02; // 2% chance per second when not in weather
+const NIGHT_MODE_INTERVAL = 5000; // 5 seconds for testing (normally 30000)
+const NIGHT_MODE_DURATION = 3000; // 3 seconds for testing (normally 10000)
+const WEATHER_EFFECT_DURATION = 3000; // 3 seconds for testing (normally 10000)
+const WEATHER_EFFECT_CHANCE = 0.002; // 0.2% chance per frame check
 
 // Ground level
 const groundY = 190;
@@ -282,6 +282,7 @@ function updateEnvironmentalEffects() {
         environmentState.mode = 'night';
         environmentState.timer = NIGHT_MODE_DURATION;
         environmentState.nightModeTimer = 0;
+        console.log('Started night mode');
     }
     
     // Check if night mode should end
@@ -289,18 +290,20 @@ function updateEnvironmentalEffects() {
         environmentState.timer -= 16;
         if (environmentState.timer <= 0) {
             environmentState.mode = 'normal';
+            console.log('Ended night mode');
         }
     }
     
     // Update weather effects
     if (environmentState.mode === 'normal' || environmentState.mode === 'night') {
-        // Random chance to start weather effect
-        if (Math.random() < WEATHER_EFFECT_CHANCE / 60) { // Adjust for 60fps
+        // Random chance to start weather effect (check every 60 frames = ~1 second)
+        if (Math.random() < WEATHER_EFFECT_CHANCE) {
             const weatherTypes = ['rain', 'sandstorm'];
             environmentState.mode = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
             environmentState.timer = WEATHER_EFFECT_DURATION;
             environmentState.particles = [];
             initializeWeatherParticles();
+            console.log('Started weather effect:', environmentState.mode);
         }
     } else if (environmentState.mode === 'rain' || environmentState.mode === 'sandstorm') {
         // Update weather timer
@@ -477,20 +480,20 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
 // Draw weather effects
 function drawWeatherEffects(offsetY, gameHeight) {
     if (environmentState.mode === 'rain') {
-        ctx.strokeStyle = 'rgba(135, 206, 235, 0.6)';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(135, 206, 235, 0.8)';
+        ctx.lineWidth = 2;
         environmentState.particles.forEach(particle => {
             if (particle.y >= offsetY && particle.y <= offsetY + gameHeight) {
                 ctx.globalAlpha = particle.opacity;
                 ctx.beginPath();
                 ctx.moveTo(particle.x, particle.y);
-                ctx.lineTo(particle.x + 2, particle.y + 8);
+                ctx.lineTo(particle.x + 3, particle.y + 10);
                 ctx.stroke();
             }
         });
         ctx.globalAlpha = 1;
     } else if (environmentState.mode === 'sandstorm') {
-        ctx.fillStyle = 'rgba(212, 165, 116, 0.3)';
+        ctx.fillStyle = 'rgba(212, 165, 116, 0.6)';
         environmentState.particles.forEach(particle => {
             if (particle.y >= offsetY && particle.y <= offsetY + gameHeight) {
                 ctx.globalAlpha = particle.opacity;
@@ -561,6 +564,11 @@ function drawConnectionStatus() {
     ctx.fillStyle = connectionStatus === 'connected' ? '#4CAF50' : '#ff4444';
     ctx.font = '10px Arial';
     ctx.fillText(connectionStatus === 'connected' ? '● Online' : '● Offline', canvas.width - 60, 15);
+    
+    // Show current environmental mode for testing
+    ctx.fillStyle = '#333';
+    ctx.font = '10px Arial';
+    ctx.fillText(`Mode: ${environmentState.mode}`, 10, canvas.height - 10);
 }
 
 // Check collisions between dino and obstacles
