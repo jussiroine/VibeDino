@@ -526,7 +526,9 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
         ctx.fillRect(0, offsetY, canvas.width, gameHeight);
         ctx.fillStyle = '#ff4444';
         ctx.font = '16px Arial';
-        ctx.fillText('SPEL AFGELOPEN 🍺', canvas.width / 2 - 70, offsetY + gameHeight / 2);
+        const gameOverText = 'SPEL AFGELOPEN 🍺';
+        const textWidth = ctx.measureText(gameOverText).width;
+        ctx.fillText(gameOverText, canvas.width / 2 - textWidth / 2, offsetY + gameHeight / 2);
     }
 }
 
@@ -643,7 +645,9 @@ function getPlayerColor(playerId) {
 function drawConnectionStatus() {
     ctx.fillStyle = connectionStatus === 'connected' ? '#008200' : '#ff4444';
     ctx.font = '10px Arial';
-    ctx.fillText(connectionStatus === 'connected' ? '🍺 Online - Proost!' : '● Offline', canvas.width - 110, 15);
+    const statusText = connectionStatus === 'connected' ? '🍺 Online - Proost!' : '● Offline';
+    const statusWidth = ctx.measureText(statusText).width;
+    ctx.fillText(statusText, canvas.width - statusWidth - 10, 15);
     
     // Show current environmental mode for testing - in Dutch!
     ctx.fillStyle = '#333';
