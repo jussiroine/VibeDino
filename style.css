@@ -18,14 +18,14 @@ body {
 }
 
 h1 {
-    color: #4CAF50;
+    color: #008200;
     margin-bottom: 20px;
     font-size: 2.5em;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 #gameCanvas {
-    border: 3px solid #4CAF50;
+    border: 3px solid #008200;
     border-radius: 5px;
     background: #f0f8ff;
     display: block;
@@ -49,7 +49,7 @@ h1 {
 
 #score {
     font-weight: bold;
-    color: #4CAF50;
+    color: #008200;
 }
 
 .game-over {
@@ -70,7 +70,7 @@ h1 {
 }
 
 .game-over button {
-    background: #4CAF50;
+    background: #008200;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -81,7 +81,7 @@ h1 {
 }
 
 .game-over button:hover {
-    background: #45a049;
+    background: #006600;
 }
 
 .hidden {

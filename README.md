@@ -1,8 +1,15 @@
-# 🦖 VibeDino - Multiplayer T-Rex Game
+# 🦖🍺 VibeDino - Heineken Edition - Multiplayer T-Rex Game 🇳🇱
 
-A feature-rich multiplayer version of the classic T-Rex dino game with **dynamic weather effects**, **night mode**, and **real-time statistics**! Players control a T-rex that jumps over obstacles while experiencing immersive environmental changes, all synchronized across multiple players in real-time.
+A feature-rich multiplayer version of the classic T-Rex dino game with **dynamic weather effects**, **night mode**, **real-time statistics**, and **authentic Dutch Heineken vibes**! Players control a T-rex that jumps over obstacles while experiencing immersive environmental changes, Dutch phrases like "schreineningen", and Heineken-green branding, all synchronized across multiple players in real-time. Proost! 🍺
 
 ## ✨ Features
+
+### 🍺 Dutch Heineken Theme
+- **🇳🇱 Authentic Dutch Phrases**: Speech bubbles display Dutch encouragement like "lekker!", "gezellig!", "schreineningen!", and "Proost!"
+- **🍺 Heineken Branding**: Signature Heineken green colors throughout the game
+- **⭐ Red Star Icon**: Classic Heineken red star accompanies your dino
+- **🗣️ Dutch Interface**: Instructions and messages in Nederlandse taal
+- **💚 Green Everything**: Heineken-inspired color palette from ground to dino
 
 ### 🎮 Core Multiplayer
 - **🚀 Instant Multiplayer**: No rooms, no waiting times - just open the game and start playing
