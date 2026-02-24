@@ -17,7 +17,7 @@ let score = 0;
 let gameSpeed = 2;
 let animationFrameId = null;
 
-// T-Rex character
+// T-Rex character - Heineken themed!
 const dino = {
     x: 50,
     y: 150,
@@ -29,7 +29,7 @@ const dino = {
     jumpForward: 4.0,
     gravity: 0.38,
     grounded: true,
-    color: '#2E7D32',
+    color: '#008200', // Heineken green!
     speechBubble: {
         message: '',
         visible: false,
@@ -44,8 +44,12 @@ const obstacleWidth = 15;
 const obstacleHeight = 12;
 let nextObstacleDistance = 0;
 
-// Speech bubble messages
-const encouragingMessages = ['yay!', 'jumpy!', 'so fast!', 'gr8!', 'awesome!', 'nice!', 'woohoo!', 'keep going!'];
+// Speech bubble messages - Dutch/Heineken themed!
+const encouragingMessages = [
+    'lekker!', 'gezellig!', 'proost!', 'schitterend!', 'geweldig!', 
+    'fantastisch!', 'prachtig!', 'heel goed!', 'ja hoor!', 'schreineningen!',
+    'Heineken!', 'oranje!', 'goed bezig!', 'top!', 'mooi zo!'
+];
 let lastSpeechBubbleTime = 0;
 
 // Environmental effects
@@ -436,13 +440,13 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, offsetY, canvas.width, gameHeight);
     
-    // Draw ground
-    ctx.fillStyle = '#8BC34A';
+    // Draw ground - Heineken green!
+    ctx.fillStyle = '#00A86B';
     ctx.fillRect(0, scaledGroundY, canvas.width, 10);
     
     // Draw ground line
-    ctx.strokeStyle = '#4CAF50';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#008200';
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(0, scaledGroundY);
     ctx.lineTo(canvas.width, scaledGroundY);
@@ -452,8 +456,8 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
     const gameScale = gameHeight / 200; // Original canvas height was 200
     const dinoY = offsetY + gameHeight - ((200 - gameState.dino.y) * gameScale) - 10;
     
-    // Draw dino with different colors for different players
-    const dinoColor = isOwnGame ? '#2E7D32' : getPlayerColor(gameState.playerId);
+    // Draw dino with different colors for different players - Heineken green for own game!
+    const dinoColor = isOwnGame ? '#008200' : getPlayerColor(gameState.playerId);
     
     // Add glow effect during night mode to make dino more visible
     if (isNightMode) {
@@ -474,6 +478,11 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
     ctx.fillStyle = dinoColor;
     ctx.fillRect(gameState.dino.x + 5 * gameScale, dinoY + dino.height * gameScale, 6 * gameScale, 8 * gameScale);
     ctx.fillRect(gameState.dino.x + 25 * gameScale, dinoY + dino.height * gameScale, 6 * gameScale, 8 * gameScale);
+    
+    // Draw Heineken star next to dino if it's our game!
+    if (isOwnGame && gameState.gameRunning) {
+        drawHeinekenStar(gameState.dino.x - 15 * gameScale, dinoY + 10 * gameScale, 8 * gameScale);
+    }
     
     // Reset shadow
     if (isNightMode) {
@@ -500,24 +509,26 @@ function drawSingleGame(gameState, offsetY, gameHeight, isOwnGame) {
         }
     });
     
-    // Draw score and player info
-    ctx.fillStyle = isOwnGame ? '#2E7D32' : '#666';
+    // Draw score and player info - Dutch style!
+    ctx.fillStyle = isOwnGame ? '#008200' : '#666';
     ctx.font = '12px Arial';
     ctx.fillText(`Score: ${gameState.score}`, 10, offsetY + 15);
     if (!isOwnGame && gameState.playerId) {
-        ctx.fillText(`Player: ${gameState.playerId.substr(0, 6)}`, 10, offsetY + 30);
+        ctx.fillText(`Speler: ${gameState.playerId.substr(0, 6)}`, 10, offsetY + 30);
     }
     
     // Draw weather effects
     drawWeatherEffects(offsetY, gameHeight);
     
-    // Draw game over indicator
+    // Draw game over indicator - Dutch style!
     if (!gameState.gameRunning) {
         ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
         ctx.fillRect(0, offsetY, canvas.width, gameHeight);
         ctx.fillStyle = '#ff4444';
         ctx.font = '16px Arial';
-        ctx.fillText('GAME OVER', canvas.width / 2 - 40, offsetY + gameHeight / 2);
+        const gameOverText = 'SPEL AFGELOPEN 🍺';
+        const textWidth = ctx.measureText(gameOverText).width;
+        ctx.fillText(gameOverText, canvas.width / 2 - textWidth / 2, offsetY + gameHeight / 2);
     }
 }
 
@@ -549,6 +560,30 @@ function drawWeatherEffects(offsetY, gameHeight) {
         });
         ctx.globalAlpha = 1;
     }
+}
+
+function drawHeinekenStar(x, y, size) {
+    // Draw a simple 5-point star in Heineken colors
+    ctx.fillStyle = '#ff0000'; // Red Heineken star
+    ctx.strokeStyle = '#008200'; // Green border
+    ctx.lineWidth = 1;
+    
+    ctx.beginPath();
+    for (let i = 0; i < 5; i++) {
+        const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+        const radius = i % 2 === 0 ? size : size / 2;
+        const px = x + Math.cos(angle) * radius;
+        const py = y + Math.sin(angle) * radius;
+        
+        if (i === 0) {
+            ctx.moveTo(px, py);
+        } else {
+            ctx.lineTo(px, py);
+        }
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
 }
 
 function drawSpeechBubble(dinoX, dinoY, message, gameScale) {
@@ -608,14 +643,16 @@ function getPlayerColor(playerId) {
 }
 
 function drawConnectionStatus() {
-    ctx.fillStyle = connectionStatus === 'connected' ? '#4CAF50' : '#ff4444';
+    ctx.fillStyle = connectionStatus === 'connected' ? '#008200' : '#ff4444';
     ctx.font = '10px Arial';
-    ctx.fillText(connectionStatus === 'connected' ? '● Online' : '● Offline', canvas.width - 60, 15);
+    const statusText = connectionStatus === 'connected' ? '🍺 Online - Proost!' : '● Offline';
+    const statusWidth = ctx.measureText(statusText).width;
+    ctx.fillText(statusText, canvas.width - statusWidth - 10, 15);
     
-    // Show current environmental mode for testing
+    // Show current environmental mode for testing - in Dutch!
     ctx.fillStyle = '#333';
     ctx.font = '10px Arial';
-    ctx.fillText(`Mode: ${environmentState.mode}`, 10, canvas.height - 10);
+    ctx.fillText(`Modus: ${environmentState.mode}`, 10, canvas.height - 10);
 }
 
 // Check collisions between dino and obstacles

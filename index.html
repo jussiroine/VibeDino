@@ -8,18 +8,20 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>VibeDino - Multiplayer</h1>
+        <h1>🍺 VibeDino - Heineken Edition 🇳🇱</h1>
         <canvas id="gameCanvas" width="800" height="400"></canvas>
         <div class="instructions">
-            <p>Press SPACEBAR or TAP/TOUCH the screen to jump over rocks!</p>
-            <p>Your Score: <span id="score">0</span></p>
-            <p><small>You can see other players' games stacked below yours!</small></p>
-            <p><small><a href="/stats.html" target="_blank" style="color: #4CAF50;">📊 View Game Statistics</a></small></p>
+            <p>Druk op SPATIEBALK of TIKT/RAAK het scherm aan om over de rotsen te springen!</p>
+            <p>Jouw Score: <span id="score">0</span></p>
+            <p><small>Je kunt de spellen van andere spelers onder de jouwe zien gestapeld!</small></p>
+            <p><small><a href="/stats.html" target="_blank" style="color: #008200;">📊 Bekijk spelstatistieken - Proost!</a></small></p>
+            <p style="color: #008200; font-weight: bold; margin-top: 10px;">🍺 Schreineningen en gezelligheid! 🍺</p>
         </div>
         <div id="gameOver" class="game-over hidden">
-            <h2>Game Over!</h2>
-            <p>Final Score: <span id="finalScore">0</span></p>
-            <button onclick="restartGame()">Play Again</button>
+            <h2>Spel Afgelopen! 🍺</h2>
+            <p>Eindscore: <span id="finalScore">0</span></p>
+            <p style="color: #008200;">Niet genoeg Heineken gedronken! Proost!</p>
+            <button onclick="restartGame()">Speel Opnieuw</button>
         </div>
     </div>
     <script src="game.js"></script>
